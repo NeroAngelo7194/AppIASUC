@@ -80,6 +80,7 @@ const initialAns: Record<number, string> = {};
 export default function HomePage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>(initialAns);
+  const [guestName, setGuestName] = useState("");
   const [noAttempts, setNoAttempts] = useState(0);
   const [showNoMsg, setShowNoMsg] = useState(false);
   const [pickError, setPickError] = useState<Record<number, boolean>>({});
@@ -104,6 +105,12 @@ export default function HomePage() {
   }, [showFinale]);
 
   function go(from: number, to: number) {
+    // Validar nombre en el paso 0
+    if (from === 0 && guestName.trim() === '') {
+      alert("¡Por favor, dime tu nombre primero! 🥺"); // O usa un setPickError si prefieres
+      return;
+    }
+
     if (from >= 3 && !answers[from]) {
       setPickError((prev) => ({ ...prev, [from]: true }));
       return;
@@ -153,7 +160,6 @@ export default function HomePage() {
   async function celebrate() {
     setShowFinale(true);
 
-    // Reemplaza 'TU_CODIGO_FORMSPREE' con tu ID de Formspree
     try {
       await fetch('https://formspree.io/f/mgogrpra', {
         method: 'POST',
@@ -162,6 +168,7 @@ export default function HomePage() {
           'Accept': 'application/json',
         },
         body: JSON.stringify({
+          nombre: guestName, // <-- AÑADIDO: Se envía el nombre
           respuesta_cita: answers[1] || '¡Sí! 💜',
           fecha_hora: answers[2] || 'No especificada',
           lugar: answers[3] || 'No seleccionado',
@@ -245,19 +252,43 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* STEP 0: Intro */}
+        {/* STEP 0: Intro y Nombre */}
         <div className={`step ${currentStep === 0 ? 'active' : ''}`} style={{ display: currentStep === 0 ? 'block' : 'none', animation: 'slideUp 0.4s cubic-bezier(.34,1.56,.64,1)' }} id="s0">
-          <div className="plea-card" style={{ background: 'var(--primary-light)', border: '2px solid rgba(124,58,237,0.2)', borderRadius: 'var(--radius)', padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'center', marginBottom: 16 }}>
-            <span className="plea-emoji" style={{ flexShrink: 0 }}>
-              <img src="/memes/gatito2.png" alt="Emoji gato" style={{ width: 56, height: 56, borderRadius: 12 }} />
-            </span>
-            <div className="plea-text" style={{ fontSize: 14, fontWeight: 700, color: 'var(--primary-dark)', lineHeight: 1.4 }}>
-              Antes de responder... ¡responde esto primero! 🥺
-              <small style={{ display: 'block', fontSize: 11, fontFamily: 'Fira Code, monospace', color: 'var(--primary)', opacity: 0.8, fontWeight: 400, marginTop: 4 }}>
-                /* se requiere una respuesta para continuar */
-              </small>
+          <div className="plea-card" style={{ background: 'var(--primary-light)', border: '2px solid rgba(124,58,237,0.2)', borderRadius: 'var(--radius)', padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', marginBottom: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%' }}>
+              <span className="plea-emoji" style={{ flexShrink: 0 }}>
+                <img src="/memes/gatito2.png" alt="Emoji gato" style={{ width: 56, height: 56, borderRadius: 12 }} />
+              </span>
+              <div className="plea-text" style={{ fontSize: 14, fontWeight: 700, color: 'var(--primary-dark)', lineHeight: 1.4, textAlign: 'left' }}>
+                Antes de comenzar... ¿Cuál es tu nombre? 🥺
+                <small style={{ display: 'block', fontSize: 11, fontFamily: 'Fira Code, monospace', color: 'var(--primary)', opacity: 0.8, fontWeight: 400, marginTop: 4 }}>
+                  /* requerimos tu nombre para iniciar el protocolo */
+                </small>
+              </div>
             </div>
+            
+            {/* NUEVO INPUT PARA EL NOMBRE */}
+            <input 
+              type="text" 
+              placeholder="Escribe tu nombre aquí..."
+              value={guestName}
+              onChange={(e) => setGuestName(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                borderRadius: 'var(--radius-sm)',
+                border: '2px solid var(--border)',
+                fontFamily: 'Nunito, sans-serif',
+                fontSize: 15,
+                fontWeight: 600,
+                outline: 'none',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+            />
           </div>
+
           <button className="btn-next" style={{ width: '100%', background: 'linear-gradient(135deg, var(--primary), var(--primary-dark))', color: 'white', border: 'none', borderRadius: 'var(--radius-sm)', padding: '14px 20px', fontFamily: 'Nunito, sans-serif', fontSize: 14, fontWeight: 800, cursor: 'pointer', transition: 'all 0.2s ease', letterSpacing: 0.5, boxShadow: '0 4px 12px rgba(124,58,237,0.3)' }} onClick={() => go(0, 1)}>
             [ INICIAR PROTOCOLO → ]
           </button>
@@ -666,6 +697,10 @@ export default function HomePage() {
             <div style={{ padding: '20px', textAlign: 'center' }}>
               <img src="/memes/gatito1.png" alt="gatito" style={{ width: 80, height: 'auto', margin: '0 auto 16px' }} />
               <h1 style={{ fontSize: 20, color: '#7c3aed', marginBottom: 4 }}>💜 ¡Cita Confirmada! 💜</h1>
+              
+              {/* NUEVA LÍNEA PARA EL NOMBRE */}
+              <h2 style={{ fontSize: 16, color: '#4b5563', marginBottom: 4, fontWeight: 700 }}>Invitada VIP: {guestName}</h2>
+              
               <p style={{ fontSize: 10, color: '#6b7280', marginBottom: 20 }}>// romance.exe iniciado correctamente</p>
             </div>
             <div style={{ padding: '0 20px 20px' }}>

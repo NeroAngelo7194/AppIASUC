@@ -363,9 +363,9 @@ export default function HomePage() {
         {/* STEP 2: ¿Cuándo estás disponible? */}
         <div className="step" style={{ display: currentStep === 2 ? 'block' : 'none' }} id="s2">
           <div className="q-card" style={{ background: 'var(--card)', borderRadius: 'var(--radius)', boxShadow: 'var(--shadow)', padding: 16, marginBottom: 16, border: '1px solid var(--border)', textAlign: 'center' }}>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
-              <img src={catImagesStep2[0]} alt="Corgi" style={{ marginTop: 10, height: 80, width: 'auto', borderRadius: 12, animation: 'pulse 2s ease-in-out infinite' }} />
-              <img src={catImagesStep2[1]} alt="Gatito emocionado" style={{ marginTop: -10, height: 120, width: 90, borderRadius: 12, animation: 'pulse 2s ease-in-out infinite', animationDelay: '0.5s' }} />
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', marginBottom: 16 }}>
+              <img src={catImagesStep2[0]} alt="Emoji guiño" style={{ height: 60, width: 60, objectFit: 'contain', animation: 'pulse 2s ease-in-out infinite' }} />
+              <img src={catImagesStep2[1]} alt="Emoji tímido" style={{ height: 64, width: 64, objectFit: 'contain', animation: 'pulse 2s ease-in-out infinite', animationDelay: '0.5s' }} />
             </div>
             <span className="q-tag" style={{ fontFamily: 'Fira Code, monospace', fontSize: 10, background: 'var(--primary-light)', color: 'var(--primary)', padding: '3px 8px', borderRadius: 100, display: 'inline-block', marginBottom: 10, fontWeight: 500 }}>
               // módulo: agenda.sync
@@ -478,41 +478,32 @@ export default function HomePage() {
             )}
 
             {showPicker === 'time' && (
-              <div style={{ marginTop: 16, background: 'var(--card)', border: '2px solid var(--accent)', borderRadius: 'var(--radius)', padding: 20, boxShadow: 'var(--shadow-lg)' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                  <button onClick={() => setTempHour((h) => (h - 1 + 24) % 24)} style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent-light)', border: 'none', fontSize: 18, cursor: 'pointer' }}>-</button>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                    <span style={{ fontSize: 36, fontWeight: 900, color: 'var(--primary-dark)' }}>{tempHour.toString().padStart(2, '0')}</span>
-                    <span style={{ fontSize: 24, color: 'var(--accent)' }}>:</span>
-                    <span style={{ fontSize: 36, fontWeight: 900, color: 'var(--primary-dark)' }}>{tempMinute.toString().padStart(2, '0')}</span>
-                  </div>
-                  <button onClick={() => setTempHour((h) => (h + 1) % 24)} style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--accent-light)', border: 'none', fontSize: 18, cursor: 'pointer' }}>+</button>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8, marginBottom: 16 }}>
-                  {[0, 15, 30, 45].map((m) => (
+              <div style={{ marginTop: 12, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 16, boxShadow: 'var(--shadow)' }}>
+                <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textAlign: 'center' }}>Selecciona una hora preferida:</p>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 16 }}>
+                  {['17:00', '18:00', '19:00', '19:30', '20:00', '21:00'].map((timeOption) => (
                     <button
-                      key={m}
-                      onClick={() => setTempMinute(m)}
+                      key={timeOption}
+                      onClick={() => { setSelectedTime(timeOption); setShowPicker(null); }}
                       style={{
-                        padding: '8px',
+                        padding: '10px 4px',
                         borderRadius: 'var(--radius-sm)',
-                        border: `2px solid ${tempMinute === m ? 'var(--accent)' : 'var(--border)'}`,
-                        background: tempMinute === m ? 'var(--accent-light)' : 'transparent',
-                        color: tempMinute === m ? 'var(--accent)' : 'var(--text)',
+                        border: `2px solid ${selectedTime === timeOption ? 'var(--accent)' : 'var(--border)'}`,
+                        background: selectedTime === timeOption ? 'var(--accent-light)' : 'var(--bg)',
+                        color: selectedTime === timeOption ? 'var(--accent)' : 'var(--text)',
                         fontWeight: 700,
                         fontSize: 13,
                         cursor: 'pointer',
+                        transition: 'all 0.2s ease',
                       }}
                     >
-                      :{m.toString().padStart(2, '0')}
+                      {timeOption}
                     </button>
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button onClick={() => { setTempHour(20); setTempMinute(0); }} style={{ flex: 1, padding: '10px', background: 'var(--primary-light)', color: 'var(--primary-dark)', border: 'none', borderRadius: 'var(--radius-sm)', fontWeight: 700, cursor: 'pointer' }}>Tarde</button>
-                  <button onClick={() => { setTempHour(21); setTempMinute(0); }} style={{ flex: 1, padding: '10px', background: 'var(--primary-light)', color: 'var(--primary-dark)', border: 'none', borderRadius: 'var(--radius-sm)', fontWeight: 700, cursor: 'pointer' }}>Noche</button>
-                </div>
-                <button onClick={() => { setSelectedTime(`${tempHour.toString().padStart(2, '0')}:${tempMinute.toString().padStart(2, '0')}`); setShowPicker(null); }} style={{ marginTop: 12, width: '100%', padding: '10px', background: 'var(--accent)', color: 'white', border: 'none', borderRadius: 'var(--radius-sm)', fontWeight: 700, fontSize: 13, cursor: 'pointer' }}>Listo ✓</button>
+                
+                <button onClick={() => setShowPicker(null)} style={{ width: '100%', padding: '10px', background: 'var(--bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}>Cancelar</button>
               </div>
             )}
 

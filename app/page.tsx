@@ -642,11 +642,14 @@ export default function HomePage() {
             <span className="big-cat" style={{ display: 'block', animation: 'pulse 2s ease-in-out infinite', marginBottom: 10 }}>
               <img src={catHeaderImg} alt="Gato grande" style={{ display: 'block', margin: '0 auto', width: 120, height: 120, objectFit: 'contain' }} />
             </span>
+            
+            {/* TÍTULO MODIFICADO PARA INCLUIR EL NOMBRE */}
             <h2 style={{ fontSize: 20, fontWeight: 900, background: 'linear-gradient(135deg, var(--primary), var(--accent))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              Resumen de compatibilidad
+              Resumen para {guestName || 'ti'}
             </h2>
+            
             <p style={{ fontFamily: 'Fira Code, monospace', fontSize: 10, color: 'var(--text-muted)', marginTop: 4 }}>
-              // análisis completado · match_score: calculando... 💜
+              // análisis de compatibilidad completado 💜
             </p>
           </div>
 

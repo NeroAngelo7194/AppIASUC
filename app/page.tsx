@@ -90,7 +90,7 @@ export default function HomePage() {
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [showPicker, setShowPicker] = useState<'date' | 'time' | null>(null);
   const [tempDate, setTempDate] = useState<Date>(new Date());
-  const [tempHour, setTempHour] = useState<number>(20);
+  const [tempHour, setTempHour] = useState<number>(18);
   const [tempMinute, setTempMinute] = useState<number>(0);
   const noButtonRef = useRef<HTMLButtonElement | null>(null);
   const yesButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -478,32 +478,86 @@ export default function HomePage() {
             )}
 
             {showPicker === 'time' && (
-              <div style={{ marginTop: 12, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: 16, boxShadow: 'var(--shadow)' }}>
-                <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-muted)', marginBottom: 12, textAlign: 'center' }}>Selecciona una hora preferida:</p>
+              <div style={{ marginTop: 12, background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '20px 16px', boxShadow: 'var(--shadow)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, marginBottom: 16 }}>
-                  {['17:00', '18:00', '19:00', '19:30', '20:00', '21:00'].map((timeOption) => (
-                    <button
-                      key={timeOption}
-                      onClick={() => { setSelectedTime(timeOption); setShowPicker(null); }}
-                      style={{
-                        padding: '10px 4px',
-                        borderRadius: 'var(--radius-sm)',
-                        border: `2px solid ${selectedTime === timeOption ? 'var(--accent)' : 'var(--border)'}`,
-                        background: selectedTime === timeOption ? 'var(--accent-light)' : 'var(--bg)',
-                        color: selectedTime === timeOption ? 'var(--accent)' : 'var(--text)',
-                        fontWeight: 700,
-                        fontSize: 13,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                      }}
-                    >
-                      {timeOption}
-                    </button>
-                  ))}
+                {/* RELOJ ANALÓGICO */}
+                <div style={{ position: 'relative', width: 100, height: 100, borderRadius: '50%', border: '4px solid var(--primary-light)', background: 'white', marginBottom: 20, boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.05)' }}>
+                  {/* Punto central */}
+                  <div style={{ position: 'absolute', top: '50%', left: '50%', width: 8, height: 8, background: 'var(--primary-dark)', borderRadius: '50%', transform: 'translate(-50%, -50%)', zIndex: 10 }}></div>
+                  
+                  {/* Manecilla de las HORAS (más corta y gruesa) */}
+                  <div style={{ 
+                    position: 'absolute', top: '50%', left: '50%', width: 4, height: 25, background: 'var(--primary-dark)', borderRadius: 2, 
+                    transformOrigin: 'bottom center',
+                    transform: `translate(-50%, -100%) rotate(${(tempHour % 12) * 30 + (tempMinute / 2)}deg)`,
+                    transition: 'transform 0.4s cubic-bezier(0.4, 2.08, 0.55, 0.44)'
+                  }}></div>
+
+                  {/* Manecilla de los MINUTOS (más larga y fina) */}
+                  <div style={{ 
+                    position: 'absolute', top: '50%', left: '50%', width: 2, height: 35, background: 'var(--accent)', borderRadius: 1, 
+                    transformOrigin: 'bottom center',
+                    transform: `translate(-50%, -100%) rotate(${tempMinute * 6}deg)`,
+                    transition: 'transform 0.4s cubic-bezier(0.4, 2.08, 0.55, 0.44)'
+                  }}></div>
+                </div>
+
+                {/* TEXTO DE LA HORA SELECCIONADA (Formato 12h) */}
+                <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--primary-dark)', marginBottom: 16 }}>
+                  {tempHour === 12 ? 12 : tempHour % 12}:{tempMinute.toString().padStart(2, '0')} <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-muted)' }}>{tempHour >= 12 ? 'PM' : 'AM'}</span>
+                </div>
+
+                {/* BOTONES DE SELECCIÓN (6:00 PM a 10:00 PM en intervalos de 30 min) */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, width: '100%', marginBottom: 16 }}>
+                  {[
+                    { h: 18, m: 0, label: '6:00' },
+                    { h: 18, m: 30, label: '6:30' },
+                    { h: 19, m: 0, label: '7:00' },
+                    { h: 19, m: 30, label: '7:30' },
+                    { h: 20, m: 0, label: '8:00' },
+                    { h: 20, m: 30, label: '8:30' },
+                    { h: 21, m: 0, label: '9:00' },
+                    { h: 21, m: 30, label: '9:30' },
+                    { h: 22, m: 0, label: '10:00' }
+                  ].map((timeObj, index) => {
+                    const isSelected = tempHour === timeObj.h && tempMinute === timeObj.m;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => { setTempHour(timeObj.h); setTempMinute(timeObj.m); }}
+                        style={{
+                          padding: '8px 4px',
+                          borderRadius: 'var(--radius-sm)',
+                          border: `2px solid ${isSelected ? 'var(--accent)' : 'var(--border)'}`,
+                          background: isSelected ? 'var(--accent-light)' : 'var(--bg)',
+                          color: isSelected ? 'var(--accent)' : 'var(--text)',
+                          fontWeight: 700,
+                          fontSize: 12,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                        }}
+                      >
+                        {timeObj.label} PM
+                      </button>
+                    );
+                  })}
                 </div>
                 
-                <button onClick={() => setShowPicker(null)} style={{ width: '100%', padding: '10px', background: 'var(--bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}>Cancelar</button>
+                {/* BOTONES DE ACCIÓN */}
+                <div style={{ display: 'flex', gap: 8, width: '100%' }}>
+                  <button onClick={() => setShowPicker(null)} style={{ flex: 1, padding: '10px', background: 'var(--bg)', color: 'var(--text-muted)', border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+                    Cancelar
+                  </button>
+                  <button onClick={() => { 
+                    // Guardamos la hora en formato AM/PM para que se envíe así a Formspree y al PDF
+                    const ampm = tempHour >= 12 ? 'PM' : 'AM';
+                    const h12 = tempHour === 12 ? 12 : tempHour % 12;
+                    setSelectedTime(`${h12}:${tempMinute.toString().padStart(2, '0')} ${ampm}`); 
+                    setShowPicker(null); 
+                  }} style={{ flex: 1, padding: '10px', background: 'linear-gradient(135deg, var(--accent), #db2777)', color: 'white', border: 'none', borderRadius: 'var(--radius-sm)', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>
+                    Listo ✓
+                  </button>
+                </div>
               </div>
             )}
 
